@@ -103,16 +103,7 @@ class Unet(nn.Module):
         return out
 
     def teacher_election(self, x, gt):
-        """
-        Perform teacher election to select the most suitable modality as the teacher for each task.
 
-        Args:
-        - x: Input data (list of modalities)
-        - gt: Ground truth segmentation mask
-
-        Returns:
-        - teachers: List of selected teachers for each task
-        """
         teachers = []
 
         for task_idx in range(gt.shape[1]):
