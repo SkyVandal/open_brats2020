@@ -29,7 +29,7 @@ pip install -r requirements.txt
 First change your data source folder by modifying values in `src/config.py`
 
 ```python
-BRATS_TRAIN_FOLDERS = "your-Path_to/brats2020/MICCAI_BraTS_2020_Data_Training"
+BRATS_TRAIN_FOLDERS = ""
 BRATS_VAL_FOLDER = "your-Path_to/brats2020/MICCAI_BraTS_2020_Data_Valdation"
 BRATS_TEST_FOLDER = "your-Path_to/brats2020/MICCAI_BraTS_2020_Data_Testing"
 ```

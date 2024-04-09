@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
 
-user = "YOU"
-BRATS_TRAIN_FOLDERS = f"/home/{user}/Datasets/brats2020/training"
-BRATS_VAL_FOLDER = f"/home/{user}/Datasets/brats2020/MICCAI_BraTS2020_ValidationData"
-BRATS_TEST_FOLDER = f"/home/{user}/Datasets/brats2020/MICCAI_BraTS2020_TestingData"
+user = "condor"
+BRATS_TRAIN_FOLDERS = f"/home/{user}/tese/data/train"
+BRATS_VAL_FOLDER = f"/home/{user}/tese/data/val"
+BRATS_TEST_FOLDER = f"/home/{user}/tese/data/test"
 
 
 def get_brats_folder(on="val"):

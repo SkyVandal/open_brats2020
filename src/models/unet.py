@@ -1,10 +1,11 @@
 """A small Unet-like zoo"""
+import numpy as np
 import torch
 from torch import nn
 from torch.utils.checkpoint import checkpoint_sequential
 
+from src.loss import EDiceLoss
 from src.models.layers import ConvBnRelu, UBlock, conv1x1, UBlockCbam, CBAM
-
 
 class Unet(nn.Module):
     """Almost the most basic U-net.
@@ -14,6 +15,8 @@ class Unet(nn.Module):
     def __init__(self, inplanes, num_classes, width, norm_layer=None, deep_supervision=False, dropout=0,
                  **kwargs):
         super(Unet, self).__init__()
+        self.dice_loss = EDiceLoss().cuda()
+        self.teachers = None
         features = [width * 2 ** i for i in range(4)]
         print(features)
 
@@ -98,6 +101,34 @@ class Unet(nn.Module):
             return out, deeps
 
         return out
+
+    def teacher_election(self, x, gt):
+        """
+        Perform teacher election to select the most suitable modality as the teacher for each task.
+
+        Args:
+        - x: Input data (list of modalities)
+        - gt: Ground truth segmentation mask
+
+        Returns:
+        - teachers: List of selected teachers for each task
+        """
+        teachers = []
+
+        for task_idx in range(gt.shape[1]):
+            task_scores = []
+            # Compute Dice scores for each modality for the current task
+            for modality_idx in range(len(x)):
+                modality_output = self.forward(x[modality_idx])
+                dice_loss = self.dice_loss.binary_dice(modality_output, gt[:, task_idx, ...], task_idx)
+                task_scores.append(dice_loss.item())
+
+            # Select the modality with the highest Dice score as the teacher for the current task
+            best_modality_idx = np.argmax(task_scores)
+            teachers.append(best_modality_idx)
+
+        self.teachers = teachers
+        return teachers
 
 
 class EquiUnet(Unet):
@@ -201,3 +232,5 @@ class Att_EquiUnet(Unet):
                 nn.Upsample(scale_factor=2, mode="trilinear", align_corners=True))
 
         self._init_weights()
+
+

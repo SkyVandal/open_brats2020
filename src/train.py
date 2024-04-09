@@ -402,6 +402,8 @@ def step(data_loader, model, criterion: EDiceLoss, metric, deep_supervision, opt
             # data augmentation step
             if mode == "train":
                 inputs = data_aug(inputs)
+                print("Inputs shape train", inputs.shape)
+
             if deep_supervision:
                 segs, deeps = model(inputs)
                 if mode == "train":  # revert the data aug
@@ -420,6 +422,14 @@ def step(data_loader, model, criterion: EDiceLoss, metric, deep_supervision, opt
                 patients_perf.append(
                     dict(id=patient_id[0], epoch=epoch, split=mode, loss=loss_.item())
                 )
+
+
+
+            if i % 1000 == 0:
+                print("Target: ", targets.shape)
+                print("Inputs", inputs.shape)
+                model.teacher_election(inputs, targets)
+                print("Current Teachers: ", model.teachers)
 
             writer.add_scalar(f"Loss/{mode}{'_swa' if swa else ''}",
                               loss_.item(),
